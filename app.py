@@ -15,22 +15,38 @@ import io
 # ================= PAGE STYLING =================
 st.markdown("""
 <style>
+/* ==== BODY & GENERAL ==== */
 body, .stApp, .block-container {background-color: #0B0B14; color: #FFFFFF; font-family: 'Inter','Poppins',sans-serif;}
-h1,h2,h3,h4,h5,h6 {color: #7C5CFF !important;}
+h1,h2,h3,h4,h5,h6 {color: #7C5CFF !important;}  /* Main headings */
+h2, h3, .stSubheader {color: #FFFFFF !important;} /* Subheaders / sections in white */
+
+/* ==== CARDS ==== */
 .card, .section-card {background-color: #0F0F1A; border: 1px solid #7C5CFF; border-radius: 18px; padding: 22px; box-shadow: 0 0 25px rgba(124,92,255,0.4); margin-bottom: 22px;}
 .hero-card {background:#0B0B14;color:#7C5CFF;padding:42px;border-radius:26px;box-shadow:0 0 40px rgba(124,92,255,0.9);text-align:center;}
-div[data-testid="stFileUploader"] > div {background: linear-gradient(135deg,rgba(124,92,255,0.15),rgba(124,92,255,0.05)) !important; border:1px solid #7C5CFF !important; border-radius:18px !important; padding:26px !important; box-shadow: inset 0 0 20px rgba(124,92,255,0.2), 0 0 15px rgba(124,92,255,0.3);}
+
+/* ==== FILE UPLOADER ==== */
+div[data-testid="stFileUploader"] > div {background-color: #1A1A2E !important; border:1px solid #7C5CFF !important; border-radius:18px !important; padding:26px !important; box-shadow: none !important;}
 div[data-testid="stFileUploader"] span, div[data-testid="stFileUploader"] p {color:#FFFFFF !important; font-weight:600;}
-div[data-testid="stFileUploader"] button {background:linear-gradient(135deg,#7C5CFF,#9A84FF) !important; color:#FFFFFF !important; border-radius:12px; box-shadow:0 0 15px rgba(124,92,255,0.6); font-weight:600;}
-.css-14xtw13 input:checked + div {background: linear-gradient(135deg,#7C5CFF,#9A84FF) !important; border-color:#7C5CFF !important;}
+div[data-testid="stFileUploader"] button {background:#7C5CFF !important; color:#FFFFFF !important; border-radius:12px; font-weight:600; box-shadow:none !important;}
+
+/* ==== SLIDERS & CHECKBOXES ==== */
+.css-14xtw13 input:checked + div {background: #7C5CFF !important; border-color:#7C5CFF !important;}
 .css-14xtw13 div {color:#FFFFFF !important;}
-.css-1kyxreq .stSlider > div > div:nth-child(1) {background: linear-gradient(135deg,#7C5CFF,#9A84FF) !important;}
+.css-1kyxreq .stSlider > div > div:nth-child(1) {background: #7C5CFF !important;}
 .css-1kyxreq .stSlider > div > div:nth-child(2) {background-color: #7C5CFF !important;}
 .css-1kyxreq .stSlider > div > div:nth-child(3) {background-color: #7C5CFF !important;}
-div.stButton > button, div.stDownloadButton > button {background:linear-gradient(135deg,#7C5CFF,#9A84FF) !important; color:#FFFFFF !important; border-radius:14px; padding:0.7em 1.4em !important; font-weight:600; box-shadow:0 0 25px rgba(124,92,255,0.6);}
-div.stButton > button:hover {transform:translateY(-2px); box-shadow:0 0 40px rgba(124,92,255,0.9);}
+
+/* ==== BUTTONS ==== */
+div.stButton > button, div.stDownloadButton > button {background:#7C5CFF !important; color:#FFFFFF; border-radius:14px; padding:0.7em 1.4em !important; font-weight:600; box-shadow:none !important;}
+div.stButton > button:hover {transform:translateY(-2px);}
+
+/* ==== METRIC BOXES ==== */
 .metric {background:#0F0F1A;color:#7C5CFF;padding:22px;border-radius:16px;text-align:center;font-weight:700;box-shadow:0 0 30px rgba(124,92,255,0.8);}
+
+/* ==== DATAFRAMES ==== */
 .stDataFrame, table {background-color:#0F0F1A; border:1px solid #7C5CFF; color:#FFFFFF;}
+
+/* ==== LINKS ==== */
 a {color:#7C5CFF;}
 a:hover {text-shadow:0 0 12px rgba(124,92,255,0.9);}
 </style>
