@@ -11,7 +11,7 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, GradientBoostingClassifier, GradientBoostingRegressor
 import numpy as np
 import io
-import plotly.express as px
+
 
 # ================= PAGE STYLING =================
 st.markdown("""
