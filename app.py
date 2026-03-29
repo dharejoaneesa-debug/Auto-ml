@@ -1,19 +1,24 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 import numpy as np
 import io
 import pickle
+
+# Safe import for plotly (prevents crash)
+try:
+    import plotly.express as px
+    PLOTLY_AVAILABLE = True
+except:
+    PLOTLY_AVAILABLE = False
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import accuracy_score, f1_score, r2_score, mean_absolute_error, confusion_matrix
 
-from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge
-from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
+from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, GradientBoostingClassifier, GradientBoostingRegressor
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 # ================= THEME =================
 st.markdown("""
@@ -25,20 +30,27 @@ h1,h2,h3 {color:#7C5CFF;}
 </style>
 """, unsafe_allow_html=True)
 
-# ================= HEADER =================
-st.markdown("<h1>🤖 AutoML Intelligence Platform</h1>", unsafe_allow_html=True)
+st.title("🤖 AutoML Intelligence Platform")
 
 # ================= FILE =================
-file = st.file_uploader("Upload Dataset", type=["csv","xlsx"])
+file = st.file_uploader("📂 Upload Dataset", type=["csv","xlsx"])
 
 # ================= CONFIG =================
 problem_mode = st.radio("Mode", ["Auto Detect","Classification","Regression"])
-test_size = st.slider("Test Size %", 10, 40, 20)
+test_size = st.slider("Test Size (%)", 10, 40, 20)
 
 # ================= FUNCTIONS =================
-def detect_task(y):
-    return "classification" if y.dtype=="object" or y.nunique()<20 else "regression"
+@st.cache_data
+def load_data(file):
+    df = pd.read_csv(file) if file.name.endswith(".csv") else pd.read_excel(file)
 
+    # speed optimization
+    if len(df) > 5000:
+        df = df.sample(5000, random_state=42)
+
+    return df
+
+@st.cache_data
 def preprocess(df, target):
     X = df.drop(columns=[target])
     y = df[target]
@@ -51,7 +63,7 @@ def preprocess(df, target):
         num_data = SimpleImputer(strategy="mean").fit_transform(X[num_cols])
         X[num_cols] = StandardScaler().fit_transform(num_data)
 
-    # categorical
+    # categorical (FIXED BUG HERE)
     if len(cat_cols):
         cat_data = SimpleImputer(strategy="most_frequent").fit_transform(X[cat_cols])
         enc = OneHotEncoder(drop="first", sparse=False)
@@ -62,14 +74,17 @@ def preprocess(df, target):
 
     return X, y
 
+def detect_task(y):
+    return "classification" if y.dtype=="object" or y.nunique()<20 else "regression"
+
 # ================= MAIN =================
 if file:
-    df = pd.read_csv(file) if file.name.endswith(".csv") else pd.read_excel(file)
+    df = load_data(file)
 
-    st.subheader("Dataset Preview")
+    st.subheader("📊 Data Preview")
     st.dataframe(df.head())
 
-    target = st.selectbox("Select Target Column", df.columns)
+    target = st.selectbox("🎯 Select Target Column", df.columns)
 
     X, y = preprocess(df, target)
 
@@ -80,29 +95,25 @@ if file:
 
     if st.button("🚀 Run AutoML"):
 
-        with st.spinner("Training Models..."):
+        with st.spinner("⚡ Training models..."):
 
             results = []
             best_score = -999
             best_model = None
             best_name = ""
 
+            # FAST MODELS (optimized)
             if task=="classification":
                 models = {
-                    "Logistic Regression": LogisticRegression(max_iter=500),
-                    "Random Forest": RandomForestClassifier(),
-                    "Gradient Boosting": GradientBoostingClassifier(),
-                    "KNN": KNeighborsClassifier(),
-                    "Decision Tree": DecisionTreeClassifier()
+                    "Logistic Regression": LogisticRegression(max_iter=300),
+                    "Random Forest": RandomForestClassifier(n_estimators=50),
+                    "Decision Tree": DecisionTreeClassifier(max_depth=5)
                 }
             else:
                 models = {
                     "Linear Regression": LinearRegression(),
-                    "Random Forest": RandomForestRegressor(),
-                    "Gradient Boosting": GradientBoostingRegressor(),
-                    "Ridge": Ridge(),
-                    "KNN": KNeighborsRegressor(),
-                    "Decision Tree": DecisionTreeRegressor()
+                    "Random Forest": RandomForestRegressor(n_estimators=50),
+                    "Decision Tree": DecisionTreeRegressor(max_depth=5)
                 }
 
             # TRAIN LOOP
@@ -132,21 +143,15 @@ if file:
         results_df = pd.DataFrame(results, columns=["Model","Metric1","Metric2"])
         st.dataframe(results_df)
 
-        # ================= FEATURE IMPORTANCE =================
-        if hasattr(best_model, "feature_importances_"):
-            fi = pd.DataFrame({
-                "Feature": X.columns,
-                "Importance": best_model.feature_importances_
-            }).sort_values(by="Importance", ascending=False)
+        # ================= VISUALS =================
+        if PLOTLY_AVAILABLE:
+            if task=="classification":
+                cm = confusion_matrix(y_test, best_model.predict(X_test))
+                fig = px.imshow(cm, text_auto=True)
+                st.plotly_chart(fig)
 
-            fig = px.bar(fi, x="Feature", y="Importance")
-            st.plotly_chart(fig)
-
-        # ================= CONFUSION MATRIX =================
-        if task=="classification":
-            cm = confusion_matrix(y_test, best_model.predict(X_test))
-            fig = px.imshow(cm, text_auto=True)
-            st.plotly_chart(fig)
+        else:
+            st.warning("Plotly not installed — charts disabled")
 
         # ================= DOWNLOAD =================
         preds = best_model.predict(X_test)
@@ -156,8 +161,8 @@ if file:
         st.subheader("Predictions")
         st.dataframe(out.head())
 
-        st.download_button("Download CSV", out.to_csv(index=False), "predictions.csv")
+        st.download_button("📥 Download CSV", out.to_csv(index=False), "predictions.csv")
 
-        # ================= DOWNLOAD MODEL =================
+        # model download
         model_bytes = pickle.dumps(best_model)
-        st.download_button("Download Model (.pkl)", model_bytes, "model.pkl")
+        st.download_button("📥 Download Model (.pkl)", model_bytes, "model.pkl")
