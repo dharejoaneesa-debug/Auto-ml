@@ -15,44 +15,165 @@ import io
 # ================= PAGE STYLING =================
 st.markdown("""
 <style>
-/* ==== BODY & GENERAL ==== */
-body, .stApp, .block-container {background-color: #0B0B14; color: #FFFFFF; font-family: 'Inter','Poppins',sans-serif;}
+/* ==== GLOBAL DARK THEME ==== */
+html, body, .stApp, .block-container {
+    background-color: #0B0B14;
+    color: #FFFFFF;
+    font-family: 'Inter', 'Poppins', sans-serif;
+}
 
-/* ==== MAIN HEADINGS ==== */
-h1, h2, h3, h4, h5, h6 {color: #FFFFFF !important;}
+/* ==== ALL HEADINGS (H1-H6) VISIBLE ==== */
+h1, h2, h3, h4, h5, h6,
+.stMarkdown h1, .stMarkdown h2, .stMarkdown h3,
+.stMarkdown h4, .stMarkdown h5, .stMarkdown h6 {
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    text-shadow: 0 0 2px rgba(124, 92, 255, 0.5);
+}
 
-/* ==== STREAMLIT SUBHEADERS ==== */
-.stSubheader, .css-1v3fvcr {color: #FFFFFF !important; font-weight:700;}
+/* ==== SUBHEADERS (st.subheader) ==== */
+.stSubheader, .st-emotion-cache-1v3fvcr {
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+}
 
-/* ==== CARDS ==== */
-.card, .section-card {background-color: #0F0F1A; border: 1px solid #7C5CFF; border-radius: 18px; padding: 22px; box-shadow: 0 0 25px rgba(124,92,255,0.4); margin-bottom: 22px;}
-.hero-card {background:#0B0B14;color:#7C5CFF;padding:42px;border-radius:26px;box-shadow:0 0 40px rgba(124,92,255,0.9);text-align:center;}
+/* ==== CARDS (custom) ==== */
+.card, .section-card {
+    background-color: #0F0F1A;
+    border: 1px solid #7C5CFF;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 0 25px rgba(124, 92, 255, 0.4);
+    margin-bottom: 22px;
+}
+.hero-card {
+    background: #0B0B14;
+    color: #7C5CFF;
+    padding: 42px;
+    border-radius: 26px;
+    box-shadow: 0 0 40px rgba(124, 92, 255, 0.9);
+    text-align: center;
+}
 
-/* ==== FILE UPLOADER ==== */
-div[data-testid="stFileUploader"] > div {background-color: #1A1A2E !important; border:1px solid #7C5CFF !important; border-radius:18px !important; padding:26px !important; box-shadow: none !important;}
-div[data-testid="stFileUploader"] span, div[data-testid="stFileUploader"] p {color:#FFFFFF !important; font-weight:600;}
-div[data-testid="stFileUploader"] button {background:#7C5CFF !important; color:#FFFFFF !important; border-radius:12px; font-weight:600; box-shadow:none !important;}
+/* ==== FILE UPLOADER (FULLY VISIBLE) ==== */
+div[data-testid="stFileUploader"] {
+    background-color: #1A1A2E !important;
+    border: 2px dashed #7C5CFF !important;
+    border-radius: 18px !important;
+    padding: 26px !important;
+}
+div[data-testid="stFileUploader"] > div {
+    background-color: transparent !important;
+}
+div[data-testid="stFileUploader"] span,
+div[data-testid="stFileUploader"] p,
+div[data-testid="stFileUploader"] label {
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+}
+div[data-testid="stFileUploader"] button {
+    background: #7C5CFF !important;
+    color: #FFFFFF !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+div[data-testid="stFileUploader"] button:hover {
+    transform: translateY(-2px);
+    background: #9b7cff !important;
+}
 
-/* ==== SLIDERS & CHECKBOXES ==== */
-.css-14xtw13 input:checked + div {background: #7C5CFF !important; border-color:#7C5CFF !important;}
-.css-14xtw13 div {color:#FFFFFF !important;}
-.css-1kyxreq .stSlider > div > div:nth-child(1) {background: #7C5CFF !important;}
-.css-1kyxreq .stSlider > div > div:nth-child(2) {background-color: #7C5CFF !important;}
-.css-1kyxreq .stSlider > div > div:nth-child(3) {background-color: #7C5CFF !important;}
+/* ==== RADIO BUTTONS (Problem Configuration) ==== */
+div[data-testid="stRadio"] {
+    background-color: #0F0F1A;
+    border-radius: 12px;
+    padding: 12px;
+}
+div[data-testid="stRadio"] label {
+    color: #FFFFFF !important;
+}
+div[data-testid="stRadio"] div[role="radiogroup"] {
+    gap: 20px;
+}
 
-/* ==== BUTTONS ==== */
-div.stButton > button, div.stDownloadButton > button {background:#7C5CFF !important; color:#FFFFFF; border-radius:14px; padding:0.7em 1.4em !important; font-weight:600; box-shadow:none !important;}
-div.stButton > button:hover {transform:translateY(-2px);}
+/* ==== SLIDERS (Test Size, KNN, Tree Depth) ==== */
+div[data-testid="stSlider"] {
+    margin: 10px 0;
+}
+div[data-testid="stSlider"] label {
+    color: #FFFFFF !important;
+    font-weight: 600;
+}
+div[data-testid="stSlider"] div[data-baseweb="slider"] {
+    background-color: #2A2A3E;
+}
+div[data-testid="stSlider"] div[data-testid="stThumbValue"] {
+    color: #7C5CFF !important;
+    font-weight: bold;
+}
+
+/* ==== NUMBER INPUTS (KNN Neighbors, Tree Depth) ==== */
+div[data-testid="stNumberInput"] label {
+    color: #FFFFFF !important;
+}
+div[data-testid="stNumberInput"] input {
+    background-color: #1A1A2E !important;
+    color: #FFFFFF !important;
+    border: 1px solid #7C5CFF;
+    border-radius: 10px;
+}
+
+/* ==== BUTTONS (General & Download) ==== */
+div.stButton > button,
+div.stDownloadButton > button {
+    background: #7C5CFF !important;
+    color: #FFFFFF !important;
+    border-radius: 14px !important;
+    padding: 0.7em 1.4em !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+div.stButton > button:hover,
+div.stDownloadButton > button:hover {
+    transform: translateY(-2px);
+    background: #9b7cff !important;
+}
 
 /* ==== METRIC BOXES ==== */
-.metric {background:#0F0F1A;color:#7C5CFF;padding:22px;border-radius:16px;text-align:center;font-weight:700;box-shadow:0 0 30px rgba(124,92,255,0.8);}
+.metric {
+    background: #0F0F1A;
+    color: #7C5CFF;
+    padding: 22px;
+    border-radius: 16px;
+    text-align: center;
+    font-weight: 700;
+    box-shadow: 0 0 30px rgba(124, 92, 255, 0.8);
+}
 
 /* ==== DATAFRAMES ==== */
-.stDataFrame, table {background-color:#0F0F1A; border:1px solid #7C5CFF; color:#FFFFFF;}
+.stDataFrame, table {
+    background-color: #0F0F1A !important;
+    border: 1px solid #7C5CFF !important;
+    color: #FFFFFF !important;
+}
+.stDataFrame th, .stDataFrame td {
+    color: #FFFFFF !important;
+}
 
 /* ==== LINKS ==== */
-a {color:#7C5CFF;}
-a:hover {text-shadow:0 0 12px rgba(124,92,255,0.9);}
+a {
+    color: #7C5CFF;
+}
+a:hover {
+    text-shadow: 0 0 12px rgba(124, 92, 255, 0.9);
+}
+
+/* ==== GENERAL TEXT & LABELS ==== */
+p, span, label, .stMarkdown, div[data-testid="stText"] {
+    color: #FFFFFF !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
