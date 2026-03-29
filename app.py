@@ -55,18 +55,18 @@ h1, h2, h3, h4, h5, h6,
     text-align: center;
 }
 
-/* ==== FILE UPLOADER (LIGHT BACKGROUND + BLACK TEXT) ==== */
+/* ==== FILE UPLOADER (DARK THEME MATCHING - WHITE TEXT) ==== */
 div[data-testid="stFileUploader"] {
-    background-color: #F0F2F6 !important;      /* Light grey background */
-    border: 2px dashed #7C5CFF !important;     /* Keep purple dashed border */
+    background-color: #1A1A2E !important;   /* Dark background like cards */
+    border: 2px dashed #7C5CFF !important;  /* Purple dashed border */
     border-radius: 18px !important;
     padding: 26px !important;
 }
-/* Make all text inside the uploader BLACK */
+/* Force ALL text inside uploader to be WHITE */
 div[data-testid="stFileUploader"] * {
-    color: #000000 !important;
+    color: #FFFFFF !important;
 }
-/* Buttons remain purple with white text */
+/* Keep button purple with white text */
 div[data-testid="stFileUploader"] button {
     background: #7C5CFF !important;
     color: #FFFFFF !important;
@@ -76,6 +76,7 @@ div[data-testid="stFileUploader"] button {
 }
 div[data-testid="stFileUploader"] button:hover {
     background: #9b7cff !important;
+    transform: translateY(-2px);
 }
 
 /* ==== RADIO BUTTONS (Problem Configuration) ==== */
