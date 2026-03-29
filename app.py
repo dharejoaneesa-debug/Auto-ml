@@ -17,8 +17,12 @@ st.markdown("""
 <style>
 /* ==== BODY & GENERAL ==== */
 body, .stApp, .block-container {background-color: #0B0B14; color: #FFFFFF; font-family: 'Inter','Poppins',sans-serif;}
-h1,h2,h3,h4,h5,h6 {color: #7C5CFF !important;}  /* Main headings */
-h2, h3, .stSubheader {color: #FFFFFF !important;} /* Subheaders / sections in white */
+
+/* ==== MAIN HEADINGS ==== */
+h1, h2, h3, h4, h5, h6 {color: #FFFFFF !important;}
+
+/* ==== STREAMLIT SUBHEADERS ==== */
+.stSubheader, .css-1v3fvcr {color: #FFFFFF !important; font-weight:700;}
 
 /* ==== CARDS ==== */
 .card, .section-card {background-color: #0F0F1A; border: 1px solid #7C5CFF; border-radius: 18px; padding: 22px; box-shadow: 0 0 25px rgba(124,92,255,0.4); margin-bottom: 22px;}
