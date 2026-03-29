@@ -55,21 +55,21 @@ h1, h2, h3, h4, h5, h6,
     text-align: center;
 }
 
-/* ==== FILE UPLOADER (FULLY VISIBLE) ==== */
+/* ==== FILE UPLOADER (FULLY VISIBLE + DRAG TEXT FIX) ==== */
 div[data-testid="stFileUploader"] {
     background-color: #1A1A2E !important;
     border: 2px dashed #7C5CFF !important;
     border-radius: 18px !important;
     padding: 26px !important;
 }
-div[data-testid="stFileUploader"] > div {
-    background-color: transparent !important;
-}
-div[data-testid="stFileUploader"] span,
-div[data-testid="stFileUploader"] p,
-div[data-testid="stFileUploader"] label {
+div[data-testid="stFileUploader"] * {
     color: #FFFFFF !important;
-    font-weight: 600 !important;
+}
+div[data-testid="stFileUploader"] .st-emotion-cache-1v0mbdj,
+div[data-testid="stFileUploader"] .st-emotion-cache-1wbqy5l,
+div[data-testid="stFileUploader"] .st-emotion-cache-16txtl3,
+div[data-testid="stFileUploader"] div[role="button"] {
+    color: #FFFFFF !important;
 }
 div[data-testid="stFileUploader"] button {
     background: #7C5CFF !important;
@@ -77,11 +77,10 @@ div[data-testid="stFileUploader"] button {
     border-radius: 12px !important;
     font-weight: 600 !important;
     border: none !important;
-    box-shadow: none !important;
 }
 div[data-testid="stFileUploader"] button:hover {
-    transform: translateY(-2px);
     background: #9b7cff !important;
+    transform: translateY(-2px);
 }
 
 /* ==== RADIO BUTTONS (Problem Configuration) ==== */
