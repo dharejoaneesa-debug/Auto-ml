@@ -1,6 +1,4 @@
 
-
-         
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -80,7 +78,7 @@ def preprocess(df, target):
             SimpleImputer(strategy="mean").fit_transform(X[num_cols])
         )
     if len(cat_cols):
-        enc = OneHotEncoder(drop="first", sparse_output=False)
+        enc = OneHotEncoder(drop="first", sparse=False)
         X_cat = enc.fit_transform(
             SimpleImputer(strategy="most_frequent").fit_transform(X[cat_cols])
         )
@@ -92,7 +90,7 @@ def preprocess(df, target):
 if file:
     df = pd.read_csv(file) if file.name.endswith(".csv") else pd.read_excel(file)
 
-    # ✅ Auto-select target for obesity dataset
+    # Auto-select target
     default_target = "NObeyesdad" if "NObeyesdad" in df.columns else df.columns[0]
     target = st.selectbox("🎯 Select Target Column", df.columns, index=list(df.columns).index(default_target))
 
@@ -142,19 +140,19 @@ if file:
             if task=="classification":
                 models = {
                     "Logistic Regression": LogisticRegression(max_iter=500),
-                    "Random Forest": RandomForestClassifier(n_estimators=n_estimators),
-                    "Gradient Boosting": GradientBoostingClassifier(n_estimators=n_estimators),
+                    "Random Forest": RandomForestClassifier(n_estimators=n_estimators, random_state=42),
+                    "Gradient Boosting": GradientBoostingClassifier(n_estimators=n_estimators, random_state=42),
                     "KNN Classifier": KNeighborsClassifier(n_neighbors=n_neighbors),
-                    "Decision Tree": DecisionTreeClassifier(max_depth=max_depth)
+                    "Decision Tree": DecisionTreeClassifier(max_depth=max_depth, random_state=42)
                 }
             else:
                 models = {
                     "Linear Regression": LinearRegression(),
-                    "Random Forest": RandomForestRegressor(n_estimators=n_estimators),
-                    "Gradient Boosting": GradientBoostingRegressor(n_estimators=n_estimators),
+                    "Random Forest": RandomForestRegressor(n_estimators=n_estimators, random_state=42),
+                    "Gradient Boosting": GradientBoostingRegressor(n_estimators=n_estimators, random_state=42),
                     "Ridge Regression": Ridge(),
                     "KNN Regressor": KNeighborsRegressor(n_neighbors=n_neighbors),
-                    "Decision Tree Regressor": DecisionTreeRegressor(max_depth=max_depth)
+                    "Decision Tree Regressor": DecisionTreeRegressor(max_depth=max_depth, random_state=42)
                 }
 
             best_score, best_model, best_name = -np.inf, None, None
@@ -216,6 +214,6 @@ if file:
             elif file_format=="Excel":
                 buffer = io.BytesIO()
                 out.to_excel(buffer, index=False, engine='openpyxl')
-                st.download_button("📥 Download Excel", buffer, "predictions.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                st.download_button("📥 Download Excel", buffer.getvalue(), "predictions.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             else:
                 st.download_button("📥 Download JSON", out.to_json(orient="records"), "predictions.json", mime="application/json")
