@@ -1,14 +1,13 @@
 
 
          
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import f1_score, r2_score, confusion_matrix, accuracy_score, mean_absolute_error
+from sklearn.metrics import accuracy_score, f1_score, r2_score, mean_absolute_error, confusion_matrix
 from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
@@ -37,15 +36,6 @@ div.stButton > button:hover {transform:translateY(-2px); box-shadow:0 0 40px rgb
 .stDataFrame, table {background-color:#0F0F1A; border:1px solid #7C5CFF; color:#FFFFFF;}
 a {color:#7C5CFF;}
 a:hover {text-shadow:0 0 12px rgba(124,92,255,0.9);}
-
-/* Hyperparameters / Active Selections Neon Purple */
-.css-1kyxreq .stSlider > div > div:nth-child(1) {background: linear-gradient(135deg,#7C5CFF,#9A84FF) !important;}
-.css-1kyxreq .stSlider > div > div:nth-child(2) {background-color: #7C5CFF !important;}
-.css-1kyxreq .stSlider > div > div:nth-child(3) {background-color: #7C5CFF !important;}
-.css-14xtw13 input:checked + div {background: linear-gradient(135deg,#7C5CFF,#9A84FF) !important; border-color:#7C5CFF !important;}
-.css-1jczs19 input:checked + div {background: linear-gradient(135deg,#7C5CFF,#9A84FF) !important; border-color:#7C5CFF !important;}
-.css-1kyxreq input:focus, .css-1kyxreq textarea:focus {border-color: #7C5CFF !important; box-shadow: 0 0 10px rgba(124,92,255,0.5);}
-div[data-testid="stFileUploader"]:hover > div {border:1px solid #7C5CFF !important;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -90,26 +80,27 @@ def preprocess(df, target):
             SimpleImputer(strategy="mean").fit_transform(X[num_cols])
         )
     if len(cat_cols):
-        enc = OneHotEncoder(drop="first", sparse=False)
+        enc = OneHotEncoder(drop="first", sparse_output=False)
         X_cat = enc.fit_transform(
             SimpleImputer(strategy="most_frequent").fit_transform(X[cat_cols])
         )
-        X = pd.concat([X.drop(columns=cat_cols),
-                       pd.DataFrame(X_cat, columns=enc.get_feature_names_out(cat_cols))],
-                      axis=1)
+        X_cat_df = pd.DataFrame(X_cat, columns=enc.get_feature_names_out(cat_cols), index=X.index)
+        X = pd.concat([X.drop(columns=cat_cols), X_cat_df], axis=1)
     return X, y
 
 # ================= MAIN =================
 if file:
     df = pd.read_csv(file) if file.name.endswith(".csv") else pd.read_excel(file)
-    target = st.selectbox("🎯 Select Target Column", df.columns)
+
+    # ✅ Auto-select target for obesity dataset
+    default_target = "NObeyesdad" if "NObeyesdad" in df.columns else df.columns[0]
+    target = st.selectbox("🎯 Select Target Column", df.columns, index=list(df.columns).index(default_target))
+
     X, y = preprocess(df, target)
     task = detect_task(y) if problem_mode=="Auto Detect" else problem_mode.lower()
     st.info(f"Detected Task: {task.upper()}")
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size/100, random_state=42
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size/100, random_state=42)
 
     # ================= TABS =================
     tab1, tab2, tab3 = st.tabs(["📊 EDA","🧠 Models","💾 Downloads"])
@@ -122,13 +113,11 @@ if file:
         st.markdown("<div class='card'>Dataset Info</div>", unsafe_allow_html=True)
         buffer = io.StringIO()
         df.info(buf=buffer)
-        # White font for df.info()
         st.markdown(f"<pre style='color:white'>{buffer.getvalue()}</pre>", unsafe_allow_html=True)
 
         st.markdown("<div class='card'>Summary Statistics</div>", unsafe_allow_html=True)
         st.dataframe(df.describe())
 
-        # Correlation heatmap with light purple shading
         st.markdown("<div class='card'>Correlation Heatmap</div>", unsafe_allow_html=True)
         corr = df.select_dtypes(include=['float64', 'int64']).corr()
         fig = px.imshow(corr, text_auto=True,
@@ -136,7 +125,6 @@ if file:
         fig.update_layout(plot_bgcolor='#0B0B14', paper_bgcolor='#0B0B14', font_color='#FFFFFF')
         st.plotly_chart(fig, use_container_width=True)
 
-        # Histograms with light purple fill and neon outline
         numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
         for col in numeric_cols:
             st.markdown(f"<div class='card'>Histogram: {col}</div>", unsafe_allow_html=True)
@@ -190,7 +178,6 @@ if file:
 
             st.success(f"Best Model: {best_name} ({round(best_score,4)})")
 
-            # ===== Metrics Display =====
             if task=="classification":
                 st.markdown("### 📈 Classification Metrics (Accuracy / F1 Weighted)")
                 for n, acc, f1 in metrics_list:
@@ -200,30 +187,18 @@ if file:
                 for n, r2, mae in metrics_list:
                     st.markdown(f"<div class='metric'>{n}<br>R²: {r2} | MAE: {mae}</div>", unsafe_allow_html=True)
 
-            # ===== Feature Importance =====
             if show_feature_importance and hasattr(best_model, "feature_importances_"):
-                fi = pd.DataFrame({
-                    "Feature": X.columns,
-                    "Importance": best_model.feature_importances_
-                }).sort_values(by="Importance", ascending=False)
-                fig = px.bar(
-                    fi, x="Feature", y="Importance", text="Importance"
-                )
-                fig.update_traces(marker=dict(color='rgba(124,92,255,0.3)',
-                                              line=dict(color='#7C5CFF', width=3)),
-                                  textposition='outside')
+                fi = pd.DataFrame({"Feature": X.columns, "Importance": best_model.feature_importances_}).sort_values(by="Importance", ascending=False)
+                fig = px.bar(fi, x="Feature", y="Importance", text="Importance")
+                fig.update_traces(marker=dict(color='rgba(124,92,255,0.3)', line=dict(color='#7C5CFF', width=3)), textposition='outside')
                 fig.update_layout(plot_bgcolor='#0B0B14', paper_bgcolor='#0B0B14', font_color='#FFFFFF', xaxis_tickangle=-45)
                 st.plotly_chart(fig, use_container_width=True)
 
-            # ===== Confusion Matrix =====
             if task=="classification" and show_confusion:
                 cm = confusion_matrix(y_test, best_model.predict(X_test))
                 st.markdown("<div class='card'>Confusion Matrix</div>", unsafe_allow_html=True)
-                fig = px.imshow(cm, text_auto=True,
-                                color_continuous_scale=[(0,'rgba(124,92,255,0.1)'), (1,'rgba(124,92,255,0.7)')],
-                                aspect="auto")
-                fig.update_layout(plot_bgcolor='#0B0B14', paper_bgcolor='#0B0B14', font_color='#FFFFFF',
-                                  xaxis_title="Predicted", yaxis_title="Actual")
+                fig = px.imshow(cm, text_auto=True, color_continuous_scale=[(0,'rgba(124,92,255,0.1)'), (1,'rgba(124,92,255,0.7)')], aspect="auto")
+                fig.update_layout(plot_bgcolor='#0B0B14', paper_bgcolor='#0B0B14', font_color='#FFFFFF', xaxis_title="Predicted", yaxis_title="Actual")
                 st.plotly_chart(fig, use_container_width=True)
 
     # ======== TAB 3: DOWNLOADS ========
@@ -241,8 +216,6 @@ if file:
             elif file_format=="Excel":
                 buffer = io.BytesIO()
                 out.to_excel(buffer, index=False, engine='openpyxl')
-                st.download_button("📥 Download Excel", buffer, "predictions.xlsx",
-                                   mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                st.download_button("📥 Download Excel", buffer, "predictions.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             else:
                 st.download_button("📥 Download JSON", out.to_json(orient="records"), "predictions.json", mime="application/json")
-                     
