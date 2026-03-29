@@ -55,22 +55,18 @@ h1, h2, h3, h4, h5, h6,
     text-align: center;
 }
 
-/* ==== FILE UPLOADER (FULLY VISIBLE + DRAG TEXT FIX) ==== */
+/* ==== FILE UPLOADER (LIGHT BACKGROUND + BLACK TEXT) ==== */
 div[data-testid="stFileUploader"] {
-    background-color: #1A1A2E !important;
-    border: 2px dashed #7C5CFF !important;
+    background-color: #F0F2F6 !important;      /* Light grey background */
+    border: 2px dashed #7C5CFF !important;     /* Keep purple dashed border */
     border-radius: 18px !important;
     padding: 26px !important;
 }
+/* Make all text inside the uploader BLACK */
 div[data-testid="stFileUploader"] * {
-    color: #FFFFFF !important;
+    color: #000000 !important;
 }
-div[data-testid="stFileUploader"] .st-emotion-cache-1v0mbdj,
-div[data-testid="stFileUploader"] .st-emotion-cache-1wbqy5l,
-div[data-testid="stFileUploader"] .st-emotion-cache-16txtl3,
-div[data-testid="stFileUploader"] div[role="button"] {
-    color: #FFFFFF !important;
-}
+/* Buttons remain purple with white text */
 div[data-testid="stFileUploader"] button {
     background: #7C5CFF !important;
     color: #FFFFFF !important;
@@ -80,7 +76,6 @@ div[data-testid="stFileUploader"] button {
 }
 div[data-testid="stFileUploader"] button:hover {
     background: #9b7cff !important;
-    transform: translateY(-2px);
 }
 
 /* ==== RADIO BUTTONS (Problem Configuration) ==== */
